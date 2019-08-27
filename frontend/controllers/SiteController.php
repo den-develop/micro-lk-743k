@@ -28,7 +28,7 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'signup'],
+                'only' => ['logout', 'signup', 'profile-update', 'index'],
                 'rules' => [
                     [
                         'actions' => ['signup'],
@@ -36,7 +36,7 @@ class SiteController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout', 'profile-update', 'index'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -74,7 +74,10 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        if (Yii::$app->user->isGuest)
+            return $this->redirect('login');
+        else
+            return $this->render('index');
     }
 
     /**
@@ -140,9 +143,19 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionAbout()
+    public function actionProfileUpdate()
     {
-        return $this->render('about');
+        $model = new SignupForm();
+        $model->initModel(Yii::$app->user->id);
+        $model->scenario = SignupForm::SCENARIO_UPDATE;
+        if ($model->load(Yii::$app->request->post()) && $model->update()) {
+            Yii::$app->session->setFlash('success', 'Profile was successful updated');
+            return $this->goHome();
+        }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
     }
 
     /**

@@ -9,10 +9,17 @@ use yii\base\Model;
  */
 class SignupForm extends Model
 {
+    const SCENARIO_UPDATE = 'update';
+
     public $username;
     public $email;
     public $password;
     public $phone;
+
+    /**
+     * @var User
+     */
+    private $_user;
 
 
     /**
@@ -26,16 +33,16 @@ class SignupForm extends Model
             ['username', 'string', 'min' => 2, 'max' => 255],
 
             ['email', 'trim'],
-            ['email', 'required'],
+            ['email', 'required', 'except' => self::SCENARIO_UPDATE],
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
             ['email', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This email address has already been taken.'],
 
-            ['password', 'required'],
+            ['password', 'required', 'except' => self::SCENARIO_UPDATE],
             ['password', 'string', 'min' => 4],
 
             ['phone', 'trim'],
-            ['phone', 'required'],
+            ['phone', 'required', 'except' => self::SCENARIO_UPDATE],
             [
                 'phone',
                 'match',
@@ -71,6 +78,27 @@ class SignupForm extends Model
             $auth->assign($role, $user->getId());
         }
         return $is_signup;
+    }
+
+    /**
+     * Updates profile of user.
+     *
+     * @return bool|null whether the updating account was successful.
+     */
+    public function update()
+    {
+        if (!$this->validate()) {
+            return null;
+        }
+
+        if(!$this->_user)
+            $this->initModel(Yii::$app->user->id);
+        $user = $this->_user;
+        $user->username = $this->username;
+        $user->phone = $this->phone;
+        $user->setPassword($this->password);
+
+        return $user->save();
 
     }
 
@@ -91,5 +119,21 @@ class SignupForm extends Model
             ->setTo($this->email)
             ->setSubject('Account registration at ' . Yii::$app->name)
             ->send();
+    }
+
+    /**
+     * Finds the User model based on its primary key value.
+     * And fills this model attributes.
+     * @param string $id
+     */
+    public function initModel($id)
+    {
+        if(!$this->_user)
+            $this->_user = User::findOne($id);
+
+        if($this->_user) {
+            $this->username = $this->_user->username;
+            $this->phone = $this->_user->phone;
+        }
     }
 }
