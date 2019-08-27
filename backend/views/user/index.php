@@ -1,5 +1,6 @@
 <?php
 
+use common\models\User;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -33,16 +34,26 @@ $this->params['breadcrumbs'][] = $this->title;
 //            'password_reset_token',
             'email:email',
             'phone',
-            'status',
+            [
+                'attribute' => 'status',
+                'value' => function ($model) {
+                    $status= [
+                        User::STATUS_DELETED => 'Deleted',
+                        User::STATUS_INACTIVE => 'Inactive',
+                        User::STATUS_ACTIVE => 'Active',
+                    ];
+                    return $status[$model->status];
+                },
+            ],
             [
                 'attribute' => 'created_at',
-                'value' => function ($model, $key, $index, $grid) {
+                'value' => function ($model) {
                     return date('Y-m-d H:i:s', $model->created_at);
                 },
             ],
             [
                 'attribute' => 'updated_at',
-                'value' => function ($model, $key, $index, $grid) {
+                'value' => function ($model) {
                     return date('Y-m-d H:i:s', $model->updated_at);
                 },
             ],
