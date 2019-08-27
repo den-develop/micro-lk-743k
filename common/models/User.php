@@ -206,4 +206,16 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $this->password_reset_token = null;
     }
+
+    /**
+     * Assigns role "user" for this user.
+     *
+     * @throws \Exception
+     */
+    public function assignRole()
+    {
+        $auth = Yii::$app->authManager;
+        $role = $auth->getRole('user');
+        $auth->assign($role, $this->getId());
+    }
 }
