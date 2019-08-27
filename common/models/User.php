@@ -86,6 +86,17 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Finds user by email.
+     *
+     * @param string $email Email of user which should be found.
+     * @return static|null
+     */
+    public static function findByEmail($email)
+    {
+        return static::findOne(['email' => $email, 'status' => self::STATUS_ACTIVE]);
+    }
+
+    /**
      * Finds user by password reset token
      *
      * @param string $token password reset token
@@ -205,17 +216,5 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
-    }
-
-    /**
-     * Assigns role "user" for this user.
-     *
-     * @throws \Exception
-     */
-    public function assignRole()
-    {
-        $auth = Yii::$app->authManager;
-        $role = $auth->getRole('user');
-        $auth->assign($role, $this->getId());
     }
 }

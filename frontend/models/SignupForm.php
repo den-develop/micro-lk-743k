@@ -24,7 +24,6 @@ class SignupForm extends Model
         return [
             ['username', 'trim'],
             ['username', 'required'],
-            ['username', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This username has already been taken.'],
             ['username', 'string', 'min' => 2, 'max' => 255],
 
             ['email', 'trim'],
@@ -66,8 +65,11 @@ class SignupForm extends Model
         $user->generateEmailVerificationToken();
 
         $is_signup = $user->save() && $this->sendEmail($user);
-        if($is_signup)
-            $user->assignRole();
+        if($is_signup) {
+            $auth = Yii::$app->authManager;
+            $role = $auth->getRole('user');
+            $auth->assign($role, $user->getId());
+        }
         return $is_signup;
 
     }
