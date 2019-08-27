@@ -150,7 +150,6 @@ class SiteController extends Controller
         $model->scenario = SignupForm::SCENARIO_UPDATE;
         if ($model->load(Yii::$app->request->post()) && $model->update()) {
             Yii::$app->session->setFlash('success', 'Profile was successful updated');
-            return $this->goHome();
         }
 
         return $this->render('update', [
