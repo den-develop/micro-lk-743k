@@ -16,6 +16,7 @@ use yii\web\IdentityInterface;
  * @property string $password_reset_token
  * @property string $verification_token
  * @property string $email
+ * @property string $phone
  * @property string $auth_key
  * @property integer $status
  * @property integer $created_at
@@ -28,6 +29,7 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
 
+    const SCENARIO_EDIT = 'edit';
 
     /**
      * {@inheritdoc}
@@ -55,6 +57,31 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
+
+            // Проверяются только в сценарии "edit".
+            [['username', 'auth_key', 'password_hash', 'email', 'created_at', 'updated_at'], 'required', 'on' => self::SCENARIO_EDIT],
+            [['status', 'created_at', 'updated_at'], 'integer', 'on' => self::SCENARIO_EDIT],
+            [['username', 'password_hash', 'password_reset_token', 'email', 'verification_token'], 'string', 'max' => 255, 'on' => self::SCENARIO_EDIT],
+            [['auth_key'], 'string', 'max' => 32, 'on' => self::SCENARIO_EDIT],
+
+            ['phone', 'trim', 'on' => self::SCENARIO_EDIT],
+            [['phone'], 'string', 'max' => 25, 'on' => self::SCENARIO_EDIT],
+            ['phone', 'required', 'on' => self::SCENARIO_EDIT],
+            [
+                'phone',
+                'match',
+                'pattern' => '/^\+[0-9]{1,2}\s\([0-9]{3}\)\s[0-9]{3}\-[0-9]{2}\-[0-9]{2}$/',
+                'message' => 'Phone number format +Х (ХХХ) ХХХ-ХХ-ХХ',
+                'on' => self::SCENARIO_EDIT
+            ],
+            ['phone', 'unique', 'on' => self::SCENARIO_EDIT],
+
+            ['email', 'trim', 'on' => self::SCENARIO_EDIT],
+            [['email'], 'unique', 'on' => self::SCENARIO_EDIT],
+            ['email', 'required', 'on' => self::SCENARIO_EDIT],
+            ['email', 'email', 'on' => self::SCENARIO_EDIT],
+
+            [['password_reset_token'], 'unique', 'on' => self::SCENARIO_EDIT],
         ];
     }
 
@@ -216,5 +243,25 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'username' => 'Username',
+            'auth_key' => 'Auth Key',
+            'password_hash' => 'Password Hash',
+            'password_reset_token' => 'Password Reset Token',
+            'email' => 'Email',
+            'phone' => 'Phone',
+            'status' => 'Status',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
+            'verification_token' => 'Verification Token',
+        ];
     }
 }
