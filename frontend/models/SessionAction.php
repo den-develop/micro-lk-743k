@@ -64,4 +64,27 @@ class SessionAction extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Sessions::className(), ['id' => 'session_id']);
     }
+
+    /**
+     * Selects data for chart build.
+     *
+     * @return array
+     * @throws \yii\db\Exception
+     */
+    public static function chartData()
+    {
+        return Yii::$app->db->createCommand('
+            select 
+                date(action_time) as date, 
+                avg(action_data_raw) as seat_time
+            from
+                session_action
+            where
+                action_type_raw=:action_type_raw
+            group by
+                date(action_time)
+            ')
+            ->bindValue(':action_type_raw', 'Seat')
+            ->queryAll();
+    }
 }

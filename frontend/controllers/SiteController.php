@@ -2,6 +2,7 @@
 namespace frontend\controllers;
 
 use frontend\models\ResendVerificationEmailForm;
+use frontend\models\SessionAction;
 use frontend\models\VerifyEmailForm;
 use Yii;
 use yii\base\InvalidArgumentException;
@@ -74,10 +75,13 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        if (Yii::$app->user->isGuest)
+        if (Yii::$app->user->isGuest){
             return $this->redirect('login');
-        else
-            return $this->render('index');
+        }
+        else {
+            $chart_data = SessionAction::chartData();
+            return $this->render('index', ['chart_data' => $chart_data]);
+        }
     }
 
     /**
