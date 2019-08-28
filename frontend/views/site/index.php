@@ -2,11 +2,48 @@
 
 /* @var $this yii\web\View */
 
-$this->title = 'My Yii Application';
+use dosamigos\chartjs\ChartJs;
+
+$this->title = 'Micro LK #743k';
 ?>
 <div class="site-index">
+    <div style="width: 700px; height: 700px; margin-left: auto; margin-right: auto ">
+    <?= ChartJs::widget([
+        'type' => 'line',
+        'options' => [
+            'height' => 200,
+            'width' => 200
+        ],
+        'data' => [
+            'labels' => ["January", "February", "March", "April", "May", "June", "July"],
+            'datasets' => [
+                [
+                    'label' => "My First dataset",
+                    'backgroundColor' => "rgba(179,181,198,0.2)",
+                    'borderColor' => "rgba(179,181,198,1)",
+                    'pointBackgroundColor' => "rgba(179,181,198,1)",
+                    'pointBorderColor' => "#fff",
+                    'pointHoverBackgroundColor' => "#fff",
+                    'pointHoverBorderColor' => "rgba(179,181,198,1)",
+                    'data' => [65, 59, '79', 81, 56, 55, 40]
+                ],
+                [
+                    'label' => "My Second dataset",
+                    'backgroundColor' => "rgba(255,99,132,0.2)",
+                    'borderColor' => "rgba(255,99,132,1)",
+                    'pointBackgroundColor' => "rgba(255,99,132,1)",
+                    'pointBorderColor' => "#fff",
+                    'pointHoverBackgroundColor' => "#fff",
+                    'pointHoverBorderColor' => "rgba(255,99,132,1)",
+                    'data' => [28, 48, 40, 19, 96, 27, 100]
+                ]
+            ]
+        ]
+    ]);
+    ?>
 
-    <div class="jumbotron">
+    </div>
+        <div class="jumbotron">
         <h1>Congratulations!</h1>
 
         <p class="lead">You have successfully created your Yii-powered application.</p>
